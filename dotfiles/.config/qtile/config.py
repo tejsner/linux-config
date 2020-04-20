@@ -180,9 +180,9 @@ screens = [
                 widget.Prompt(foreground=white, cursor_color=green),
                 widget.WindowName(foreground=white),
                 widget.Systray(padding=5, icon_size=20),
-                #widget.Battery(battery=0, **battery_conf)
-                #widget.Battery(battery=1, **battery_conf)
-                #widget.Backlight(backlight_name='intel_backlight', **backlight_conf)
+                #widget.Battery(battery=0, **battery_conf),
+                #widget.Battery(battery=1, **battery_conf),
+                #widget.Backlight(backlight_name='intel_backlight', **backlight_conf),
                 widget.TextBox(' \N{Keyboard}', foreground=white),
                 widget.KeyboardLayout(configured_keyboards=['us', 'dk'], fmt='{}', foreground=white),
                 widget.PulseVolume(emoji=False, fmt='\N{Speaker}{}', foreground=white),
