@@ -39,6 +39,15 @@ my_terminal = "termite"
 # Switch between monad and bsd layputs/keybinds
 main_layout = "monad"
 
+# Colors from nord theem
+bg_color = "#2E3440"
+group_border_color = "#5E81AC"
+window_border_color = "#B48EAD"
+urgent_color = "#BF616A"
+white = "#ECEFF4"
+grey = "#4C566A"
+green = "#A3BE8C"
+
 # Run autostart.sh on startup
 @hook.subscribe.startup_once
 def autostart():
@@ -116,10 +125,8 @@ for i in groups:
         # Key([mod, "shift"], i.name, lazy.window.togroup(i.name)),
     ])
 
-# border_focus color from nord theme
 layout_conf = {
-    "border_focus": "#5E81AC",
-    "border_normal": "#000000",
+    "border_focus": window_border_color,
     "border_width": 2,
     "margin": 0,
 }
@@ -133,41 +140,57 @@ if main_layout == 'bsp':
 if main_layout == 'monad':
     layouts = [
         layout.Max(),
-        # layout.Stack(num_stacks=2),
-        # Try more layouts by unleashing below layouts.
-        # layout.Bsp()
-        # layout.Columns()
-        # layout.Matrix(),
         layout.MonadTall(**layout_conf),
         layout.MonadWide(**layout_conf),
-        # layout.RatioTile(),
-        # layout.Tile(),
-        # layout.TreeTab(),
-        # layout.VerticalTile(),
-        # layout.Zoomy(),
     ]
 
 widget_defaults = dict(
     font='source code pro',
-    fontsize=12,
+    fontsize=14,
     padding=3,
 )
+
+groupbox_conf = {
+    'urgent_border': urgent_color,
+    'this_current_screen_border': group_border_color,
+    'active': white,
+    'inactive': grey,
+}
+
+battery_conf = {
+    "format": "\N{Battery}{percent:2.0%}",
+    "update_interval": 10,
+    "show_short_text": False,
+    "full_char" : "",
+    "discharge_char": "v",
+}
+
+backlight_conf = {
+    "change_command": "brightnessctl s {0}%",
+    "step": 4,
+    "format": "\N{High Brightness Symbol}{percent:2.0%}",
+}
 
 screens = [
     Screen(
         bottom=bar.Bar(
             [
-                widget.CurrentLayoutIcon(),
-                widget.GroupBox(),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Systray(),
-                widget.PulseVolume(emoji=False, fmt='\N{Speaker}{}'),
-                widget.TextBox('\N{Calendar}'),
-                widget.Clock(format='%a %d/%m %H:%M'),
+                widget.CurrentLayoutIcon(foreground=white),
+                widget.GroupBox(**groupbox_conf),
+                widget.Prompt(foreground=white, cursor_color=green),
+                widget.WindowName(foreground=white),
+                widget.Systray(padding=5, icon_size=20),
+                #widget.Battery(battery=0, **battery_conf)
+                #widget.Battery(battery=1, **battery_conf)
+                #widget.Backlight(backlight_name='intel_backlight', **backlight_conf)
+                widget.TextBox(' \N{Keyboard}', foreground=white),
+                widget.KeyboardLayout(configured_keyboards=['us', 'dk'], fmt='{}', foreground=white),
+                widget.PulseVolume(emoji=False, fmt='\N{Speaker}{}', foreground=white),
+                widget.TextBox('\N{Calendar}', foreground=white),
+                widget.Clock(format='%a %d/%m %H:%M', foreground=white),
             ],
             24,
-            background='#2e3440',
+            background=bg_color,
         ),
         wallpaper='/home/tim/Dropbox/wallpaper.jpg',
         wallpaper_mode='fill',
