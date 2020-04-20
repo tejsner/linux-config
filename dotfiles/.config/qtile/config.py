@@ -32,39 +32,20 @@ import subprocess
 
 from typing import List  # noqa: F401
 
+# Primary mod key (mod4=super)
+mod = "mod4"
+# Terminal emulator bound to mod+enter
+my_terminal = "termite"
+# Switch between monad and bsd layputs/keybinds
+main_layout = "monad"
+
+# Run autostart.sh on startup
 @hook.subscribe.startup_once
 def autostart():
     home = os.path.expanduser('~/.config/qtile/autostart.sh')
     subprocess.call([home])
 
-mod = "mod4"
-my_terminal = "termite"
-
 keys = [
-    # Switch between windows in current stack pane
-    Key([mod], "j", lazy.layout.down()),
-    Key([mod], "k", lazy.layout.up()),
-    Key([mod], "h", lazy.layout.left()),
-    Key([mod], "l", lazy.layout.right()),
-
-    # Move windows in current stack
-    Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
-    Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
-    Key([mod, "shift"], "h", lazy.layout.shuffle_left()),
-    Key([mod, "shift"], "l", lazy.layout.shuffle_right()),
-
-    # Change ratios
-    Key([mod, "control"], "j", lazy.layout.grow_down()),
-    Key([mod, "control"], "k", lazy.layout.grow_up()),
-    Key([mod, "control"], "h", lazy.layout.grow_left()),
-    Key([mod, "control"], "l", lazy.layout.grow_right()),
-
-    # Normalize layout
-    Key([mod, "control"], "n", lazy.layout.normalize()),
-
-    # Toggle split in relation to adjecent windows
-    Key([mod, "control"], "o", lazy.layout.toggle_split()),
-
     # Switch between groups on current screen
     Key([mod], "period", lazy.screen.next_group()),
     Key([mod], "comma", lazy.screen.prev_group()),
@@ -86,6 +67,41 @@ keys = [
     Key([mod], "space", lazy.spawncmd()),
 ]
 
+if main_layout == "bsp":
+    keys.extend([
+        Key([mod], "j", lazy.layout.down()),
+        Key([mod], "k", lazy.layout.up()),
+        Key([mod], "h", lazy.layout.left()),
+        Key([mod], "l", lazy.layout.right()),
+        Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
+        Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
+        Key([mod, "shift"], "h", lazy.layout.shuffle_left()),
+        Key([mod, "shift"], "l", lazy.layout.shuffle_right()),
+        Key([mod, "control"], "j", lazy.layout.grow_down()),
+        Key([mod, "control"], "k", lazy.layout.grow_up()),
+        Key([mod, "control"], "h", lazy.layout.grow_left()),
+        Key([mod, "control"], "l", lazy.layout.grow_right()),
+        Key([mod, "control"], "n", lazy.layout.normalize()),
+        Key([mod, "control"], "o", lazy.layout.toggle_split()),
+    ])
+
+if main_layout == 'monad':
+    keys.extend([
+        Key([mod], "h", lazy.layout.left()),
+        Key([mod], "l", lazy.layout.right()),
+        Key([mod], "j", lazy.layout.down()),
+        Key([mod], "k", lazy.layout.up()),
+        Key([mod, "shift"], "h", lazy.layout.swap_left()),
+        Key([mod, "shift"], "l", lazy.layout.swap_right()),
+        Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
+        Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
+        Key([mod], "i", lazy.layout.grow()),
+        Key([mod], "m", lazy.layout.shrink()),
+        Key([mod], "n", lazy.layout.normalize()),
+        Key([mod], "o", lazy.layout.maximize()),
+        Key([mod, "shift"], "space", lazy.layout.flip()),
+    ])
+
 groups = [Group(i) for i in "123456"]
 
 for i in groups:
@@ -100,26 +116,36 @@ for i in groups:
         # Key([mod, "shift"], i.name, lazy.window.togroup(i.name)),
     ])
 
-layouts = [
-    layout.Max(),
-    # layout.Stack(num_stacks=2),
-    # Try more layouts by unleashing below layouts.
-    layout.Bsp(
-        border_focus='#5E81AC',
-        border_normal='#000000',
-        border_width=2,
-        grow_amount=5,
-        margin=0),
-    # layout.Columns()
-    # layout.Matrix(),
-    # layout.MonadTall(),
-    # layout.MonadWide(),
-    # layout.RatioTile(),
-    # layout.Tile(),
-    # layout.TreeTab(),
-    # layout.VerticalTile(),
-    # layout.Zoomy(),
-]
+# border_focus color from nord theme
+layout_conf = {
+    "border_focus": "#5E81AC",
+    "border_normal": "#000000",
+    "border_width": 2,
+    "margin": 0,
+}
+
+if main_layout == 'bsp':
+    layouts = [
+        layout.Max(),
+        layout.Bsp(grow_amount=5, **layout_conf),
+    ]
+
+if main_layout == 'monad':
+    layouts = [
+        layout.Max(),
+        # layout.Stack(num_stacks=2),
+        # Try more layouts by unleashing below layouts.
+        # layout.Bsp()
+        # layout.Columns()
+        # layout.Matrix(),
+        layout.MonadTall(**layout_conf),
+        layout.MonadWide(**layout_conf),
+        # layout.RatioTile(),
+        # layout.Tile(),
+        # layout.TreeTab(),
+        # layout.VerticalTile(),
+        # layout.Zoomy(),
+    ]
 
 widget_defaults = dict(
     font='source code pro',
@@ -136,15 +162,7 @@ screens = [
                 widget.Prompt(),
                 widget.WindowName(),
                 widget.Systray(),
-                widget.Battery(battery=0, format='\N{Battery}{percent:2.0%}',
-                    update_interval=10, show_short_text=False, full_char='', discharge_char='v'),
-                widget.Battery(battery=1, format='\N{Battery}{percent:2.0%}',
-                    update_interval=10, show_short_text=False, full_char='', discharge_char='v'),
                 widget.PulseVolume(emoji=False, fmt='\N{Speaker}{}'),
-                widget.Backlight(backlight_name='intel_backlight',
-                    change_command='brightnessctl s {0}%', step=4,
-                    format='\N{High Brightness Symbol}{percent:2.0%}'),
-                #ErDetFredag(), 
                 widget.TextBox('\N{Calendar}'),
                 widget.Clock(format='%a %d/%m %H:%M'),
             ],
