@@ -18,10 +18,16 @@ _comp_options+=(globdots) # include hidden files
 # fix ctrl+shift+t in termite
 source /etc/profile.d/vte.sh
 
+# accept autosuggestion with C-SPC
+bindkey '^ ' autosuggest-accept
+
 # aliases
 alias ls='ls -F -x --color=auto --group-directories-first'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
+
+# Environment
+set editor=vim
 
 # Load ; should be last.
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
