@@ -112,14 +112,21 @@ local mytextclock = wibox.widget.textclock(markup(gray, "| ") .. "%d %b %H:%M:%S
 mytextclock.font = theme.font
 mytextclock.refresh = 1
 
--- CPU
-local cpu = lain.widget.sysload({
+-- System Load
+-- local sys = lain.widget.sysload({
+--     settings = function()
+--         widget:set_markup(markup.font(theme.font, markup(gray, "SYS ") .. load_1))
+--     end
+-- })
+
+-- CPU Load
+local cpu = lain.widget.cpu({
     settings = function()
-        widget:set_markup(markup.font(theme.font, markup(gray, "CPU ") .. load_1))
+        widget:set_markup(markup.font(theme.font, markup(gray, "CPU ") .. cpu_now.usage))
     end
 })
 
--- MEM
+-- Memory used
 local mem = lain.widget.mem({
     settings = function()
         widget:set_markup(markup.font(theme.font, markup(gray, "MEM ") .. mem_now.used))
