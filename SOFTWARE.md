@@ -12,3 +12,9 @@
 ## Doom emacs
 * Install `emacs`
 * Check the [documentation](https://github.com/hlissner/doom-emacs) for installation instructions. Running `doom doctor` can help determine if you need certain packages.
+
+## AwesomeWM
+* Install awesome and lain-git (AUR)
+* Software used by the config: `dmenu`
+* Font used by the config `roboto`
+* Software run on startup: `dropbox`, `flameshot`, `unclutter`

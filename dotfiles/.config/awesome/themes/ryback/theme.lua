@@ -14,26 +14,50 @@ local dpi   = require("beautiful.xresources").apply_dpi
 local os = os
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
 
-local theme                                     = {}
-theme.zenburn_dir                               = require("awful.util").get_themes_dir() .. "zenburn"
-theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/steamburn"
-theme.wallpaper                                 = theme.dir .. "/wall.png"
-theme.font                                      = "Terminus 10.5"
-theme.fg_normal                                 = "#e2ccb0"
-theme.fg_focus                                  = "#d88166"
-theme.fg_urgent                                 = "#CC9393"
-theme.bg_normal                                 = "#140c0b"
-theme.bg_focus                                  = "#140c0b"
-theme.bg_urgent                                 = "#2a1f1e"
-theme.border_width                              = dpi(1)
-theme.border_normal                             = "#302627"
-theme.border_focus                              = "#c2745b"
-theme.border_marked                             = "#CC9393"
-theme.taglist_fg_focus                          = "#d88166"
-theme.tasklist_bg_focus                         = "#140c0b"
-theme.tasklist_fg_focus                         = "#d88166"
-theme.taglist_squares_sel                       = theme.dir .. "/icons/square_sel.png"
-theme.taglist_squares_unsel                     = theme.dir .. "/icons/square_unsel.png"
+local theme = {}
+
+-- Nord colors
+theme.nord0  = "#2E3440"
+theme.nord1  = "#3B4252"
+theme.nord2  = "#434C5E"
+theme.nord3  = "#4C566A"
+theme.nord4  = "#D8DEE9"
+theme.nord5  = "#E5E9F0"
+theme.nord6  = "#ECEFF4"
+theme.nord7  = "#8FBCBB"
+theme.nord8  = "#88C0D0"
+theme.nord9  = "#81A1C1"
+theme.nord10 = "#5E81AC"
+theme.nord11 = "#BF616A"
+theme.nord12 = "#D08770"
+theme.nord13 = "#EBCB8B"
+theme.nord14 = "#A3BE8C"
+theme.nord15 = "#B48EAD"
+
+theme.fg_normal = theme.nord4
+theme.fg_focus = theme.nord4
+theme.fg_urgent = theme.nord12
+
+theme.bg_normal = theme.nord0
+theme.bg_focus = theme.nord0
+theme.bg_urgent = theme.nord0
+
+theme.border_normal = theme.nord0
+theme.border_focus = theme.nord9
+theme.border_marked = theme.nord9
+
+theme.taglist_fg_focus = theme.nord0
+theme.taglist_bg_focus = theme.nord9
+
+theme.tasklist_fg_focus = theme.nord9
+theme.tasklist_bg_focus = theme.nord0
+
+theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/ryback"
+theme.wallpaper                                 = theme.dir .. "/wallpaper.jpg"
+theme.font = "Roboto 11"
+theme.wibar_height = dpi(22)
+
+theme.border_width                              = dpi(2)
 theme.menu_height                               = dpi(16)
 theme.menu_width                                = dpi(140)
 theme.awesome_icon                              = theme.dir .."/icons/awesome.png"
@@ -53,6 +77,8 @@ theme.layout_txt_floating                       = "[|]"
 theme.tasklist_plain_task_name                  = true
 theme.tasklist_disable_icon                     = true
 theme.useless_gap                               = dpi(0)
+
+theme.zenburn_dir                               = require("awful.util").get_themes_dir() .. "zenburn"
 theme.titlebar_close_button_normal              = theme.zenburn_dir.."/titlebar/close_normal.png"
 theme.titlebar_close_button_focus               = theme.zenburn_dir.."/titlebar/close_focus.png"
 theme.titlebar_minimize_button_normal           = theme.zenburn_dir.."/titlebar/minimize_normal.png"
@@ -79,60 +105,12 @@ theme.layout_txt_termfair                       = "[termfair]"
 theme.layout_txt_centerfair                     = "[centerfair]"
 
 local markup = lain.util.markup
-local gray   = "#94928F"
+local gray = theme.tasklist_fg_focus
 
 -- Textclock
-local mytextclock = wibox.widget.textclock(" %H:%M ")
+local mytextclock = wibox.widget.textclock(markup(theme.tasklist_fg_focus, " %d %b ") .. "%H:%M:%S ")
 mytextclock.font = theme.font
-
--- Calendar
--- theme.cal = lain.widget.cal({
---     attach_to = { mytextclock },
---     notification_preset = {
---         font = "Terminus 11",
---         fg   = theme.fg_normal,
---         bg   = theme.bg_normal
---     }
--- })
-
--- Mail IMAP check
---[[ commented because it needs to be set before use
-theme.mail = lain.widget.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
-    settings = function()
-        mail  = ""
-        count = ""
-
-        if mailcount > 0 then
-            mail = "Mail "
-            count = mailcount .. " "
-        end
-
-        widget:set_markup(markup(gray, mail) .. count)
-    end
-})
---]]
-
--- MPD
-theme.mpd = lain.widget.mpd({
-    settings = function()
-        artist = mpd_now.artist .. " "
-        title  = mpd_now.title  .. " "
-
-        if mpd_now.state == "pause" then
-            artist = "mpd "
-            title  = "paused "
-        elseif mpd_now.state == "stop" then
-            artist = ""
-            title  = ""
-        end
-
-        widget:set_markup(markup.font(theme.font, markup(gray, artist) .. title))
-    end
-})
+mytextclock.refresh = 1
 
 -- CPU
 local cpu = lain.widget.sysload({
@@ -147,14 +125,6 @@ local mem = lain.widget.mem({
         widget:set_markup(markup.font(theme.font, markup(gray, " Mem ") .. mem_now.used .. " "))
     end
 })
-
--- /home fs
---[[ commented because it needs Gio/Glib >= 2.54
-theme.fs = lain.widget.fs({
-    partition = "/home",
-    notification_preset = { fg = theme.fg_normal, bg = theme.bg_normal, font = "Terminus 10.5" },
-})
---]]
 
 -- Battery
 local bat = lain.widget.bat({
@@ -190,14 +160,10 @@ theme.volume = lain.widget.alsa({
     end
 })
 
--- Weather
--- theme.weather = lain.widget.weather({
---     city_id = 2643743, -- placeholder (London)
--- })
-
 -- Separators
 local first = wibox.widget.textbox(markup.font("Terminus 4", " "))
 local spr   = wibox.widget.textbox(' ')
+
 
 local function update_txt_layoutbox(s)
     -- Writes a string representation of the current layout in a textbox widget
@@ -240,7 +206,7 @@ function theme.at_screen_connect(s)
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "top", screen = s, height = dpi(18) })
+    s.mywibox = awful.wibar({ position = "top", screen = s, height = theme.wibar_height })
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -251,7 +217,7 @@ function theme.at_screen_connect(s)
             s.mytaglist,
             spr,
             s.mytxtlayoutbox,
-            --spr,
+            spr,
             s.mypromptbox,
             spr,
         },
@@ -259,14 +225,15 @@ function theme.at_screen_connect(s)
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
-            -- spr,
+            spr,
             -- theme.mpd.widget,
             --theme.mail.widget,
             cpu.widget,
             mem.widget,
-            bat.widget,
+            -- bat.widget,
             net.widget,
-            theme.volume.widget,
+            -- theme.volume.widget,
+            clock_prefix,
             mytextclock
         },
     }
