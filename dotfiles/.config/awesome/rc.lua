@@ -57,7 +57,7 @@ local function run_once(cmd_arr)
     end
 end
 
-run_once({ "flameshot", "dropbox start", "unclutter -root" }) -- entries must be separated by commas
+run_once({ "setxkbmap -layout 'us,dk'", "redshift", "flameshot", "dropbox start", "unclutter -root" }) -- entries must be separated by commas
 
 -- This function implements the XDG autostart specification
 --[[
@@ -72,19 +72,6 @@ awful.spawn.with_shell(
 -- }}}
 
 -- {{{ Variable definitions
-
-local themes = {
-    "blackburn",       -- 1
-    "copland",         -- 2
-    "dremora",         -- 3
-    "holo",            -- 4
-    "multicolor",      -- 5
-    "powerarrow",      -- 6
-    "powerarrow-dark", -- 7
-    "rainbow",         -- 8
-    "steamburn",       -- 9
-    "vertex",          -- 10
-}
 
 local chosen_theme = "ryback"
 local modkey       = "Mod4"
@@ -431,42 +418,37 @@ globalkeys = my_table.join(
     --           {description = "dropdown application", group = "launcher"}),
 
     -- Brightness
-    -- awful.key({ }, "XF86MonBrightnessUp", function () os.execute("brightnessctl s +10%" ) end,
-    --           {description = "+10%", group = "hotkeys"}),
-    -- awful.key({ }, "XF86MonBrightnessDown", function () os.execute("brightnessctl s 10%-") end,
-    --           {description = "-10%", group = "hotkeys"}),
+    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("brightnessctl s +10%" ) end,
+              {description = "+10%", group = "hotkeys"}),
+    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("brightnessctl s 10%-") end,
+              {description = "-10%", group = "hotkeys"}),
 
-    -- ALSA volume control
+    -- PulseAudio volume control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
+            os.execute(string.format("pactl set-sink-volume %s +1%%", beautiful.volume.device))
             beautiful.volume.update()
-        end,
-        {description = "volume up", group = "hotkeys"}),
+        end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
+            os.execute(string.format("pactl set-sink-volume %s -1%%", beautiful.volume.device))
             beautiful.volume.update()
-        end,
-        {description = "volume down", group = "hotkeys"}),
+        end),
     awful.key({ altkey }, "m",
         function ()
-            os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
+            os.execute(string.format("pactl set-sink-mute %s toggle", beautiful.volume.device))
             beautiful.volume.update()
-        end,
-        {description = "toggle mute", group = "hotkeys"}),
+        end),
     awful.key({ altkey, "Control" }, "m",
         function ()
-            os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
+            os.execute(string.format("pactl set-sink-volume %s 100%%", beautiful.volume.device))
             beautiful.volume.update()
-        end,
-        {description = "volume 100%", group = "hotkeys"}),
+        end),
     awful.key({ altkey, "Control" }, "0",
         function ()
-            os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
+            os.execute(string.format("pactl set-sink-volume %s 0%%", beautiful.volume.device))
             beautiful.volume.update()
-        end,
-        {description = "volume 0%", group = "hotkeys"}),
+        end),
 
     -- Copy primary to clipboard (terminals to gtk)
     awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
@@ -474,6 +456,10 @@ globalkeys = my_table.join(
     -- Copy clipboard to primary (gtk to terminals)
     awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
               {description = "copy gtk to terminal", group = "hotkeys"}),
+
+    -- Switch keyboard layout
+    awful.key({ modkey }, "0", function () beautiful.mykeyboardlayout.next_layout(); end,
+        {description = "switch between keyboard layouts", group = "hotkeys"}),
 
     -- Default
     --[[ Menubar

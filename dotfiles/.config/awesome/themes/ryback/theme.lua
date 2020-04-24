@@ -54,8 +54,9 @@ theme.tasklist_bg_focus = theme.nord0
 
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/ryback"
 theme.wallpaper                                 = theme.dir .. "/wallpaper.jpg"
-theme.font = "Roboto 11"
+theme.font = "Source Code Pro 10"
 theme.wibar_height = dpi(22)
+theme.useless_gap = dpi(0)
 
 theme.border_width                              = dpi(2)
 theme.menu_height                               = dpi(16)
@@ -76,7 +77,6 @@ theme.layout_txt_magnifier                      = "[M]"
 theme.layout_txt_floating                       = "[|]"
 theme.tasklist_plain_task_name                  = true
 theme.tasklist_disable_icon                     = true
-theme.useless_gap                               = dpi(0)
 
 theme.zenburn_dir                               = require("awful.util").get_themes_dir() .. "zenburn"
 theme.titlebar_close_button_normal              = theme.zenburn_dir.."/titlebar/close_normal.png"
@@ -108,21 +108,21 @@ local markup = lain.util.markup
 local gray = theme.tasklist_fg_focus
 
 -- Textclock
-local mytextclock = wibox.widget.textclock(markup(theme.tasklist_fg_focus, " %d %b ") .. "%H:%M:%S ")
+local mytextclock = wibox.widget.textclock(markup(gray, "| ") .. "%d %b %H:%M:%S" .. markup(gray, " |"))
 mytextclock.font = theme.font
 mytextclock.refresh = 1
 
 -- CPU
 local cpu = lain.widget.sysload({
     settings = function()
-        widget:set_markup(markup.font(theme.font, markup(gray, " Cpu ") .. load_1 .. " "))
+        widget:set_markup(markup.font(theme.font, markup(gray, "CPU ") .. load_1))
     end
 })
 
 -- MEM
 local mem = lain.widget.mem({
     settings = function()
-        widget:set_markup(markup.font(theme.font, markup(gray, " Mem ") .. mem_now.used .. " "))
+        widget:set_markup(markup.font(theme.font, markup(gray, "MEM ") .. mem_now.used))
     end
 })
 
@@ -130,40 +130,58 @@ local mem = lain.widget.mem({
 local bat = lain.widget.bat({
     settings = function()
         local perc = bat_now.perc
-        if bat_now.ac_status == 1 then perc = perc .. " Plug" end
-        widget:set_markup(markup.font(theme.font, markup(gray, " Bat ") .. perc .. " "))
+        if bat_now.ac_status == 1 then
+            perc = perc .. "|P"
+        else
+            perc = perc .. "|U"
+        end
+        widget:set_markup(markup.font(theme.font, markup(gray, "BAT ") .. perc))
     end
 })
 
 -- Net checker
 local net = lain.widget.net({
     settings = function()
-        if net_now.state == "up" then net_state = "On"
-        else net_state = "Off" end
-        widget:set_markup(markup.font(theme.font, markup(gray, " Net ") .. net_state .. " "))
+        if net_now.state == "up" then net_state = "ON"
+        else net_state = "OFF" end
+        widget:set_markup(markup.font(theme.font, markup(gray, "NET ") .. net_state))
     end
 })
 
--- ALSA volume
-theme.volume = lain.widget.alsa({
-    settings = function()
-        header = " Vol "
-        vlevel  = volume_now.level
-
-        if volume_now.status == "off" then
-            vlevel = vlevel .. "M "
-        else
-            vlevel = vlevel .. " "
+-- PulseAudio Volume
+theme.volume = lain.widget.pulse({
+        settings = function()
+            vlevel = volume_now.right
+            if volume_now.muted == "yes" then
+                vlevel = vlevel .. " M"
+            end
+            widget:set_markup(markup.font(theme.font, markup(gray, "VOL ") .. vlevel))
         end
-
-        widget:set_markup(markup.font(theme.font, markup(gray, header) .. vlevel))
-    end
 })
+
+-- Redshift
+myredshift = wibox.widget.textbox()
+lain.widget.contrib.redshift:attach(
+    myredshift,
+    function (active)
+        if active then
+            label = "ON"
+        else
+            label = "OFF"
+        end
+        myredshift:set_text("RS " .. label)
+        myredshift:set_markup(markup.font(theme.font, markup(gray, "RS ") .. label))
+    end
+)
+myredshift.font = theme.font
+
+-- Keyboard Indicator
+theme.mykeyboardlayout = awful.widget.keyboardlayout()
+theme.mykeyboardlayout.widget.font = theme.font
 
 -- Separators
-local first = wibox.widget.textbox(markup.font("Terminus 4", " "))
-local spr   = wibox.widget.textbox(' ')
-
+local first = wibox.widget.textbox(markup.font("Source Code Pro 4", " "))
+local spr   = wibox.widget.textbox(markup.font(theme.font, " "))
 
 local function update_txt_layoutbox(s)
     -- Writes a string representation of the current layout in a textbox widget
@@ -226,15 +244,20 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             spr,
-            -- theme.mpd.widget,
-            --theme.mail.widget,
             cpu.widget,
+            spr,
             mem.widget,
-            -- bat.widget,
+            spr,
+            bat.widget,
+            spr,
             net.widget,
-            -- theme.volume.widget,
-            clock_prefix,
-            mytextclock
+            spr,
+            myredshift,
+            spr,
+            theme.volume.widget,
+            spr,
+            mytextclock,
+            theme.mykeyboardlayout
         },
     }
 end
