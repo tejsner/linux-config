@@ -153,7 +153,7 @@ theme.volume = lain.widget.pulse({
         settings = function()
             vlevel = volume_now.right
             if volume_now.muted == "yes" then
-                vlevel = vlevel .. " M"
+                vlevel = vlevel .. "|M"
             end
             widget:set_markup(markup.font(theme.font, markup(gray, "VOL ") .. vlevel))
         end

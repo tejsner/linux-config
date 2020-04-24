@@ -15,6 +15,6 @@
 
 ## AwesomeWM
 * Install awesome and lain-git (AUR)
-* Software used by the config: `dmenu`
+* Software used by the config: `dmenu`, `slock`
 * Font used by the config `adobe-source-code-pro-fonts`
 * Software run on startup: `dropbox`, `flameshot`, `unclutter`, `redshift`
