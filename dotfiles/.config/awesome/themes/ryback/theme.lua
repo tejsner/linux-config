@@ -56,7 +56,7 @@ theme.dir                                       = os.getenv("HOME") .. "/.config
 theme.wallpaper                                 = theme.dir .. "/wallpaper.jpg"
 theme.font = "Source Code Pro 10"
 theme.wibar_height = dpi(22)
-theme.useless_gap = dpi(0)
+theme.useless_gap = dpi(5)
 
 theme.border_width                              = dpi(2)
 theme.menu_height                               = dpi(16)
@@ -100,7 +100,7 @@ theme.titlebar_maximized_button_focus_inactive  = theme.zenburn_dir.."/titlebar/
 theme.titlebar_maximized_button_normal_active   = theme.zenburn_dir.."/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active    = theme.zenburn_dir.."/titlebar/maximized_focus_active.png"
 
--- lain related
+-- ain related
 theme.layout_txt_termfair                       = "[termfair]"
 theme.layout_txt_centerfair                     = "[centerfair]"
 
@@ -122,7 +122,9 @@ mytextclock.refresh = 1
 -- CPU Load
 local cpu = lain.widget.cpu({
     settings = function()
-        widget:set_markup(markup.font(theme.font, markup(gray, "CPU ") .. cpu_now.usage))
+        usage = cpu_now.usage
+        if usage < 10 then usage = '0' .. usage end
+        widget:set_markup(markup.font(theme.font, markup(gray, "CPU ") .. usage))
     end
 })
 
