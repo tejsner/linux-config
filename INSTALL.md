@@ -193,6 +193,12 @@ vim .zshrc
 chsh -s /usr/bin/zsh
 ```
 
+### Sync time
+```
+sudo pacman -S ntp
+sudo systemctl enable ntpd.service
+```
+
 ### Fix two-finger scroll after suspend
 
 Add `psmouse.synaptics_intertouch=0` to `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`. For example, with default settings:
