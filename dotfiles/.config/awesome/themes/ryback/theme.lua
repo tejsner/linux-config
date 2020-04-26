@@ -108,7 +108,7 @@ local markup = lain.util.markup
 local gray = theme.tasklist_fg_focus
 
 -- Textclock
-local mytextclock = wibox.widget.textclock(markup(gray, "| ") .. "%d %b %H:%M:%S" .. markup(gray, " |"))
+local mytextclock = wibox.widget.textclock(markup(gray, "TIME ") .. "%d %b %H:%M:%S ")
 mytextclock.font = theme.font
 mytextclock.refresh = 1
 
@@ -187,6 +187,7 @@ myredshift.font = theme.font
 -- Keyboard Indicator
 theme.mykeyboardlayout = awful.widget.keyboardlayout()
 theme.mykeyboardlayout.widget.font = theme.font
+local keyboard_prefix   = wibox.widget.textbox(markup.font(theme.font, markup(gray, "KEY")))
 
 -- Separators
 local first = wibox.widget.textbox(markup.font("Source Code Pro 4", " "))
@@ -265,8 +266,9 @@ function theme.at_screen_connect(s)
             spr,
             theme.volume.widget,
             spr,
-            mytextclock,
-            theme.mykeyboardlayout
+            keyboard_prefix,
+            theme.mykeyboardlayout,
+            mytextclock
         },
     }
 end
