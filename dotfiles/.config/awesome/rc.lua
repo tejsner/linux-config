@@ -57,7 +57,7 @@ local function run_once(cmd_arr)
     end
 end
 
-run_once({ "setxkbmap -layout 'us,dk'", "redshift", "flameshot", "dropbox start", "unclutter -root" }) -- entries must be separated by commas
+run_once({ "imwheel", "setxkbmap -layout 'us,dk'", "redshift", "flameshot", "dropbox start", "unclutter -root" }) -- entries must be separated by commas
 
 -- This function implements the XDG autostart specification
 --[[
