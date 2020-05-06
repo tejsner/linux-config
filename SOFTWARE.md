@@ -19,6 +19,11 @@
 * Font used by the config `adobe-source-code-pro-fonts`
 * Software run on startup: `dropbox`, `flameshot`, `unclutter`, `redshift`
 
+## I3
+* Install i3-gaps
+* Software used by the config: `xss-lock`, `dmenu`, `i3lock`, `i3status`, `feh`, `maim`
+* Fonts used: `adobe-source-code-pro-fonts`, `ttf-font-awesome`
+
 ## Theming (on non-KDE/non-Gnome desktops)
 * Install lxappearance (for GTK apps)
 * Install qt5ct (for Qt5 apps)
