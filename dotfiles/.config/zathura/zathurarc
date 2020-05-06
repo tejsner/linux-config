@@ -1,0 +1,4 @@
+set selection-clipboard clipboard
+set window-height 1300
+set window-width 1100
+set scroll-step 125

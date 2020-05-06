@@ -114,7 +114,7 @@ rm -rf yay
 yay
 brightnessctl
 pulseaudio, pulseaudio-alsa, pulsemixer
-termite
+alacritty
 firefox
 discord
 noto-fonts, noto-fonts-emoji, noto-fonts-extra, adobe-source-code-pro-fonts, ttf-liberation
@@ -128,6 +128,10 @@ clang
 fd
 ripgrep
 texlive-most
+arandr
+ttf-font-awesome
+maim
+dmenu-git (dev version fixes focussing issue)
 ```
 
 ### Qtile

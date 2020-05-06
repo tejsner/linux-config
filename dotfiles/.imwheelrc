@@ -1,8 +1,0 @@
-# Speed up scrolling for the document viewer
-"^.*zathura$"
-    None, Up, Button4, 5
-    None, Down, Button5, 5
-
-"^discord$"
-    None, Up, Button4, 5
-    None, Down, Button5, 5

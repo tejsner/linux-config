@@ -18,3 +18,8 @@
 * Software used by the config: `dmenu`, `slock`
 * Font used by the config `adobe-source-code-pro-fonts`
 * Software run on startup: `dropbox`, `flameshot`, `unclutter`, `redshift`
+
+## Theming (on non-KDE/non-Gnome desktops)
+* Install lxappearance (for GTK apps)
+* Install qt5ct (for Qt5 apps)
+* Set the environment variable `QT_QPA_PLATFORMTHEME="qt5ct"`
