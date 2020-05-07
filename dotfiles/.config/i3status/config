@@ -19,10 +19,23 @@ general {
 order += "wireless _first_"
 order += "path_exists VPN"
 order += "volume master"
+order += "battery all"
 order += "load"
 #order += "cpu_usage"
 order += "memory"
 order += "tztime local"
+
+battery all {
+	integer_battery_capacity = true
+	format = "%status %percentage"
+	status_chr = ""
+	status_bat = ""
+	status_unk = ""
+	status_full = ""
+	path = "/sys/class/power_supply/BAT%d/uevent"
+	low_threshold = 10
+	threshold_type = "percentage"
+}
 
 path_exists VPN {
 	path = "/proc/sys/net/ipv4/conf/tun0"

@@ -37,7 +37,8 @@ vim /etc/locale.gen
 locale-gen
 
 echo 'LANG=en_DK.UTF-8' >> /etc/locale.conf
-echo '<hostname>' >> /etc/hostname	
+echo 'LC_NUMERIC=en_US.UTF-8' >> /etc/locale.conf
+echo '<hostname>' >> /etc/hostname
 	
 vim /etc/hosts
   127.0.0.1   localhost
