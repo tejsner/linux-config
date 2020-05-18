@@ -102,7 +102,9 @@ Desktop
 ```
 pacman -S xorg nvidia
 ```
+
 ### yay
+Makes installing packages and dependencies from AUR super easy. Highly recommeneded.
 ```
 git clone https://aur.archlinux.org/yay.git
 cd yay
@@ -110,15 +112,19 @@ makepkg -si
 rm -rf yay
 ```
 
-### Common packages
+### Window Manager
+* See [SOFTWARE.mc](./SOFTWARE.md) for instructions on QTile, AwesomeWM and i3wm.
+* KDE/Gnome pretty much works out of the box, so no need for detailed instructions.
+
+### Common packages (2)
 ```
-yay
 brightnessctl
 pulseaudio, pulseaudio-alsa, pulsemixer
 alacritty
 firefox
 discord
 noto-fonts, noto-fonts-emoji, noto-fonts-extra, adobe-source-code-pro-fonts, ttf-liberation
+ttf-roboto, ttf-font-awesome
 spotify-tui, spotifyd
 emacs
 htop
@@ -130,19 +136,15 @@ fd
 ripgrep
 texlive-most
 arandr
-ttf-font-awesome
 maim
 dmenu-git (dev version fixes focussing issue)
+pcmanfm (lightweight gui file manager if not running gnome/kde)
+nnn
+mpv
+gvim
 ```
 
-### Qtile
-```
-yay -S qtile, xorg-init
-vim ~/.xinitrc
-  exec qtile
-```
-
-### Bluetooth (should work with QC35)
+### Bluetooth (works with QC35 headset)
 ```
 sudo pacman -Syu pulseaudio-bluetooth bluez bluez-libs bluez-utils
 
@@ -176,26 +178,6 @@ cudo chmod 750 /etc/openvpn/update-resolv-conf
 sudo cp /etc/openvpn/client/mullvad_xx /etc/openvpn/client/mullvad.conf
 sudo systemctl start openvpn-client@mullvad.service
 curl https://am.i.mullvad.net/connected
-```
-
-### ZSH
-```
-sudo pacman -S zsh zsh-completions zsh-syntax-highlighting zsh-autosuggestions
-vim .zshrc
-  zstyle :compinstall filename '/home/tim/.zshrc'
-
-  autoload -Uz compinit promptinit
-  compinit
-  promptinit
-  
-  prompt walters
-
-  alias ls='ls -F -x --color=auto --group-directories-first'
-  alias grep='grep --color=auto'
-  alias diff='diff --color=auto'
-
-// change default shell for current user
-chsh -s /usr/bin/zsh
 ```
 
 ### Sync time

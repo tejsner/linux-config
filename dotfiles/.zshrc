@@ -16,7 +16,7 @@ compinit
 _comp_options+=(globdots) # include hidden files
 
 # fix ctrl+shift+t in termite
-source /etc/profile.d/vte.sh
+# source /etc/profile.d/vte.sh
 
 # accept autosuggestion with C-SPC
 bindkey '^ ' autosuggest-accept
@@ -26,9 +26,12 @@ alias ls='ls -F -x --color=auto --group-directories-first'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 
+# dir colors
+test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors)
+
 # env
 export EDITOR=vim
-export GUI_EDITOR=emacs
+export GUI_EDITOR=gvim
 
 # Load ; should be last.
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -63,3 +66,18 @@ n ()
             rm -f "$NNN_TMPFILE" > /dev/null
     fi
 }
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/tim/.miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/tim/.miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/tim/.miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/tim/.miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<

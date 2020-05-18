@@ -19,7 +19,7 @@ general {
 order += "wireless _first_"
 order += "path_exists VPN"
 order += "volume master"
-order += "battery all"
+#order += "battery all"
 order += "load"
 #order += "cpu_usage"
 order += "memory"
@@ -44,7 +44,7 @@ path_exists VPN {
 }
 
 load {
-	format = " %5min"
+	format = " %1min"
 }
 
 wireless _first_ {
