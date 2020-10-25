@@ -1,3 +1,10 @@
+#+title Emacs configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ./.emacs.d/init.el :mkdirp yes
+
+* Basic GUI Stuff
+
+#+begin_src emacs-lisp
+
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1) ; Disable visual scrollbar
 (tool-bar-mode -1) ; Disable toolbar
@@ -14,9 +21,22 @@
 (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 110)
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 130 :weight 'regular)
 
+;; Line numbers
+(column-number-mode)
+(global-display-line-numbers-mode t)
 
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		shell-mode-hook
+		eshell-mode-hook))
+  (add-hook mode (lambda() (display-line-numbers-mode 0))))
+
+#+end_src
+
+* Packages
+
+#+begin_src emacs-lisp
 
 ;; Initialize package sources
 (require 'package)
@@ -36,18 +56,12 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;; Line numbers
-(column-number-mode)
-(global-display-line-numbers-mode t)
+#+end_src
 
-;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
-  (add-hook mode (lambda() (display-line-numbers-mode 0))))
+* Ivy
 
-;; Ivy
+#+begin_src emacs-lisp
+
 (use-package ivy
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
@@ -75,6 +89,12 @@
 (use-package ivy-rich
   :init
   (ivy-rich-mode 1))
+
+#+end_src
+
+* DOOM, Rainbow, Whichkey, Helpful
+
+#+begin_src emacs-lisp
 
 ;; all-the-icons
 (use-package all-the-icons)
@@ -110,7 +130,12 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-;; general.el
+#+end_src
+
+* General
+
+#+begin_src emacs-lisp
+
 (use-package general
   :config
   (general-create-definer tim/leader-keys
@@ -118,7 +143,12 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-;; evil
+#+end_src
+
+* Evil
+
+#+begin_src emacs-lisp
+
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -142,7 +172,12 @@
   :config
   (evil-collection-init))
 
-;; hydra example
+#+end_src
+
+* Hydra Example
+
+#+begin_src emacs-lisp
+
 (use-package hydra)
 
 (defhydra hydra-text-scale (:timeout 4)
@@ -151,8 +186,12 @@
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
+#+end_src
 
-;; projectile
+* Projectile
+
+#+begin_src emacs-lisp
+
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -166,7 +205,12 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
-;; magit
+#+end_src
+
+* Magit
+
+#+begin_src emacs-lisp
+
 (use-package magit
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -179,7 +223,11 @@
 ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
 ;; (use-package forge)
 
-;; Org
+#+end_src
+
+* Org
+
+#+begin_src emacs-lisp
 
 (defun tim/org-mode-setup ()
   (org-indent-mode)
@@ -267,9 +315,55 @@
 (use-package visual-fill-column
   :hook (org-mode . tim/org-mode-visual-fill))
 
+#+end_src
+
+** Structure templates
+
+#+begin_src emacs-lisp
+
+(org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)
+   (python . t)))
+
+(setq org-confirm-babel-evaluate nil)
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+
+#+end_src
 
 
-;; keybinds
+** Auto-tangle configuration files
+
+#+begin_src emacs-lisp
+
+;; Automatically tangle our Emacs.org config file when we save it
+(defun tim/org-babel-tangle-config ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "~/emacs.org"))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'tim/org-babel-tangle-config)))
+
+#+end_src
+
+* Keybinds
+
+#+begin_src emacs-lisp
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 (tim/leader-keys
   "t"  '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
@@ -290,18 +384,6 @@
   "o"  '(:ignore t :which-key "org")
   "oa" '(org-agenda :which-key "agenda"))
 
+#+end_src
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(which-key use-package rainbow-delimiters ivy-rich hydra helpful general evil-magit evil-collection doom-themes doom-modeline counsel-projectile)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
