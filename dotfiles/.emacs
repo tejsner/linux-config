@@ -11,6 +11,9 @@
 
 ;; Font
 (set-face-attribute 'default nil :font "Fira Code" :height 110)
+(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 110)
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 130 :weight 'regular)
+
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -148,22 +151,6 @@
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
-;; keybinds
-(tim/leader-keys
-  "t"  '(:ignore t :which-key "toggles")
-  "tt" '(counsel-load-theme :which-key "choose theme")
-  "ts" '(hydra-text-scale/body :which-key "scale text"))
-
-(tim/leader-keys
-  "f"  '(:ignore t :which-key "files")
-  "ff" 'find-file)
-
-(tim/leader-keys
-  "p"  '(projectile-command-map :which-key "projectile"))
-
-(tim/leader-keys
-  "g"  '(:ignore t :which-key "git")
-  "gs" '(magit-status :which-key "status"))
 
 ;; projectile
 (use-package projectile
@@ -192,3 +179,129 @@
 ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
 ;; (use-package forge)
 
+;; Org
+
+(defun tim/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 0)
+  (visual-line-mode 1))
+
+(use-package org
+  :hook (org-mode . tim/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾")
+
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  
+  (setq org-agenda-files
+	'("~/Dropbox/org/tasks.org"
+	  "~/Dropbox/org/birthdays.org"
+	  "~/Dropbox/org/habits.org"))
+
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-graph-column 60)
+
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
+
+  (setq org-refile-targets
+    '(("archive.org" :maxlevel . 1)
+      ("tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  (setq org-capture-templates
+    `(("t" "Tasks / Projects")
+      ("tt" "Task" entry (file+olp "~/Dropbox/org/tasks.org" "Inbox")
+           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+
+      ("j" "Journal Entries")
+      ("jj" "Journal" entry
+           (file+olp+datetree "~/Dropbox/org/journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+           :clock-in :clock-resume
+           :empty-lines 1)
+      ("jm" "Meeting" entry
+           (file+olp+datetree "~/Dropbox/org/journal.org")
+           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
+
+      ("w" "Workflows")
+      ("we" "Checking Email" entry (file+olp+datetree "~/Dropbox/org/journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+
+      ("m" "Metrics Capture")
+      ("mw" "Weight" table-line (file+headline "~/Dropbox/org/metrics.org" "Weight")
+       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+  )
+
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(defun tim/org-mode-visual-fill ()
+  (setq visual-fill-column-width 150
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . tim/org-mode-visual-fill))
+
+
+
+;; keybinds
+(tim/leader-keys
+  "t"  '(:ignore t :which-key "toggles")
+  "tt" '(counsel-load-theme :which-key "choose theme")
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+(tim/leader-keys
+  "f"  '(:ignore t :which-key "files")
+  "ff" 'find-file)
+
+(tim/leader-keys
+  "p"  '(projectile-command-map :which-key "projectile"))
+
+(tim/leader-keys
+  "g"  '(:ignore t :which-key "git")
+  "gs" '(magit-status :which-key "status"))
+
+(tim/leader-keys
+  "o"  '(:ignore t :which-key "org")
+  "oa" '(org-agenda :which-key "agenda"))
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(which-key use-package rainbow-delimiters ivy-rich hydra helpful general evil-magit evil-collection doom-themes doom-modeline counsel-projectile)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
