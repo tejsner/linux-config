@@ -135,6 +135,11 @@
   :config
   (evil-collection-init))
 
+(use-package undo-fu
+  :config
+  (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
+  (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
+
 (use-package hydra)
 
 (defhydra hydra-text-scale (:timeout 4)
