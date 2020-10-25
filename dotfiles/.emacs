@@ -2,7 +2,7 @@
 (scroll-bar-mode -1) ; Disable visual scrollbar
 (tool-bar-mode -1) ; Disable toolbar
 (tooltip-mode -1) ; Disable tooltips
-(set-fringe-mode 10) ; Give some breathing room
+(set-fringe-mode 0) ; Give some breathing room
 
 (menu-bar-mode -1) ; Disable the menu bar
 
@@ -86,7 +86,6 @@
 (use-package doom-themes)
 (load-theme 'doom-palenight t)
 
-
 ;; Rainbow delimters
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -114,11 +113,7 @@
   (general-create-definer tim/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
-    :global-prefix "C-SPC")
-
-  (tim/leader-keys
-    "t"  '(:ignore t :which-key "toggles")
-    "tt" '(counsel-load-theme :which-key "choose theme")))
+    :global-prefix "C-SPC"))
 
 ;; evil
 (use-package evil
@@ -144,7 +139,6 @@
   :config
   (evil-collection-init))
 
-
 ;; hydra example
 (use-package hydra)
 
@@ -154,30 +148,47 @@
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
+;; keybinds
 (tim/leader-keys
+  "t"  '(:ignore t :which-key "toggles")
+  "tt" '(counsel-load-theme :which-key "choose theme")
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
-
-;; keybinds
-
-;; file mangement
 (tim/leader-keys
   "f"  '(:ignore t :which-key "files")
   "ff" 'find-file)
 
-;; git
-;; apps
+(tim/leader-keys
+  "p"  '(projectile-command-map :which-key "projectile"))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(hydra evil-collection evil general doom-themes helpful counsel ivy-rich which-key whichkey rainbow-delimiters swiper use-package ivy doom-modeline)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(tim/leader-keys
+  "g"  '(:ignore t :which-key "git")
+  "gs" '(magit-status :which-key "status"))
+
+;; projectile
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/src")
+    (setq projectile-project-search-path '("~/src")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+;; magit
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package evil-magit
+  :after magit)
+
+;; NOTE: Make sure to configure a GitHub token before using this package!
+;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+;; (use-package forge)
+
