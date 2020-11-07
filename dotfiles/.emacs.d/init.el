@@ -1,3 +1,8 @@
+(defvar tim/default-font "Fira Code")
+(defvar tim/default-variable-font "Cantarell")
+(defvar tim/default-font-size 110)
+(defvar tim/default-variable-font-size 130)
+
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1) ; Disable visual scrollbar
 (tool-bar-mode -1) ; Disable toolbar
@@ -10,9 +15,9 @@
 (setq visible-bell t)
 
 ;; Font
-(set-face-attribute 'default nil :font "Fira Code" :height 110)
-(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 110)
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 130 :weight 'regular)
+(set-face-attribute 'default nil :font tim/default-font :height tim/default-font-size)
+(set-face-attribute 'fixed-pitch nil :font tim/default-font :height tim/default-font-size)
+(set-face-attribute 'variable-pitch nil :font tim/default-variable-font :height tim/default-variable-font-size :weight 'regular)
 
 ;; Line numbers
 (column-number-mode)
@@ -103,7 +108,8 @@
   ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  ([remap describe-key] . helpful-key)
+  ([remap describe-bindings] . counsel-descbinds))
 
 (use-package general
   :config
@@ -259,6 +265,10 @@
 (use-package visual-fill-column
   :hook (org-mode . tim/org-mode-visual-fill))
 
+(use-package org-re-reveal
+  :init
+  (setq org-re-reveal-root "/home/tim/src/reveal.js"))
+
 (org-babel-do-load-languages
   'org-babel-load-languages
   '((emacs-lisp . t)
@@ -281,6 +291,41 @@
       (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'tim/org-babel-tangle-config)))
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "l" 'dired-single-buffer))
+
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+    
+(use-package dired-open
+  :config
+  ;; Doesn't work as expected!
+  ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+  (setq dired-open-extensions '(("png" . "feh")
+                                ("mkv" . "mpv")
+                                ("mw" . "xmaple"))))
+
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "H" 'dired-hide-dotfiles-mode))
+
+;; needed for marking extensions
+(require 'dired-x)
+
+;; move to trash rather than deleting
+;; (setq delete-by-moving-to-trash t)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
