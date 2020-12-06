@@ -38,7 +38,8 @@
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
-		eshell-mode-hook))
+		eshell-mode-hook
+              treemacs-mode-hook))
   (add-hook mode (lambda() (display-line-numbers-mode 0))))
 
 #+end_src
@@ -209,25 +210,6 @@
 
 #+end_src
 
-* Projectile
-
-#+begin_src emacs-lisp
-
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :init
-  ;; NOTE: Set this to the folder where you keep your Git repos!
-  (when (file-directory-p "~/src")
-    (setq projectile-project-search-path '("~/src")))
-  (setq projectile-switch-project-action #'projectile-dired))
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
-
-#+end_src
-
 * Magit
 
 #+begin_src emacs-lisp
@@ -346,7 +328,8 @@
 
 (use-package org-re-reveal
   :init
-  (setq org-re-reveal-root "/home/tim/src/reveal.js"))
+  (setq org-re-reveal-root "/home/tim/src/reveal.js")
+  (setq org-re-reveal-revealjs-version "4"))
 
 #+end_src
 
@@ -434,6 +417,8 @@
 
 * Keybinds
 
+Leader keys similar to spacemacs/doom.
+
 #+begin_src emacs-lisp
 
 ;; Make ESC quit prompts
@@ -458,6 +443,184 @@
 (tim/leader-keys
   "o"  '(:ignore t :which-key "org")
   "oa" '(org-agenda :which-key "agenda"))
+
+(tim/leader-keys
+  "c"  '(:ignore t :which-key "code")
+  "cc" '(compile :which-key "compile")
+  "cd" '(dap-hydra :which-key "debug"))
+
+#+end_src
+
+* Development
+
+** Projectile
+
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/src")
+    (setq projectile-project-search-path '("~/src")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+#+end_src
+
+** Language servers
+
+*** lsp-mode
+
+#+begin_src emacs-lisp
+
+(defun tim/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . tim/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "SPC l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
+
+#+end_src
+
+*** lsp-ui
+
+Prettier pop-up documentation in lsp mode.
+
+#+begin_src emacs-lisp
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+#+end_src
+
+*** lsp-treemacs 
+
+Lsp integration with treemacs. This includes trees for functions/classes/etc inside project files.
+
+#+begin_src emacs-lisp
+
+(use-package lsp-treemacs
+  :after lsp)
+
+#+end_src
+
+*** lsp-ivy
+
+lsp integration with ivy
+
+#+begin_src emacs-lisp
+
+(use-package lsp-ivy)
+
+#+end_src
+
+** Debugging (dap-mode)
+
+Website with tutorials: https://emacs-lsp.github.io/dap-mode/page/configuration/
+Useful commands:
+  - dap-debug
+  - dap-debug-last
+  - dap-debug-recent
+  - dap-disconnect
+  - dap-breakpoint-toggle
+  - dap-breakpoint-log-message
+  - dap-breakpoint-condition
+  - dap-ui-show-many-windows
+  - dap-ui-hide-many-windows
+  - dap-ui-sessions
+dap-hydra for command palette.
+dap-ui-repl for interactive console
+dap-tooltip-at-point to inspect objects
+
+vs code debug configurations should work out of the box.
+That is, dap-mode can read the json file.
+
+
+#+begin_src emacs-lisp
+
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+  :config
+  ;; Set up Node debugging
+  (require 'dap-node)
+  (dap-node-setup)) ;; Automatically installs Node debug adapter if needed
+
+#+end_src
+
+** Company mode
+
+Modern tab-completion in emacs.
+
+#+begin_src emacs-lisp
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+#+end_src
+
+** Languages
+
+*** Python
+
+todo: pyvenv package (or others). what is best for managing venvs in python on linux?
+
+#+begin_src emacs-lisp
+
+(use-package python-mode
+  :ensure t
+  ;:hook (python-mode . lsp-deferred)
+  :custom
+  (python-shell-interpreter "python"))
+
+#+end_src
+
+*** TypeScript
+
+#+begin_src emacs-lisp
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+
+#+end_src
+
+** Commenting
+
+Commenting that works a little more like you would expect from other editors.
+
+#+begin_src emacs-lisp
+
+(use-package evil-nerd-commenter
+  :bind ("M-;" . evilnc-comment-or-uncomment-lines))
 
 #+end_src
 
