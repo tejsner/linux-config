@@ -31,23 +31,30 @@
               treemacs-mode-hook))
   (add-hook mode (lambda() (display-line-numbers-mode 0))))
 
-;; Initialize package sources
+;; straight.el bootstrap
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;;;;  Effectively replace use-package with straight-use-package
+;;; https://github.com/raxod502/straight.el/blob/develop/README.md#integration-with-use-package
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+;;;;  package.el
+;;; so package-list-packages includes them
 (require 'package)
-
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-(unless package-archive-contents
- (package-refresh-contents))
-
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-   (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
 
 (use-package ivy
   :bind (("C-s" . swiper)
@@ -82,7 +89,6 @@
 
 ;; DOOM modeline
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
@@ -158,9 +164,6 @@
 (use-package magit
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package evil-magit
-  :after magit)
 
 ;; NOTE: Make sure to configure a GitHub token before using this package!
 ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
@@ -281,28 +284,23 @@
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'tim/org-babel-tangle-config)))
 
-(use-package dired
-  :ensure nil
-  :commands (dired dired-jump)
-  :bind (("C-x C-j" . dired-jump))
-  :custom ((dired-listing-switches "-agho --group-directories-first"))
-  :config
-  (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-single-up-directory
-    "l" 'dired-single-buffer))
+(setq dired-listing-switches "-agho --group-directories-first")
 
 (use-package dired-single)
 
+(evil-collection-define-key 'normal 'dired-mode-map
+  "h" 'dired-single-up-directory
+  "l" 'dired-single-buffer)
+
 (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode))
-    
+
 (use-package dired-open
   :config
   ;; Doesn't work as expected!
-  ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+  ;;   ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
   (setq dired-open-extensions '(("png" . "feh")
-                                ("mkv" . "mpv")
-                                ("mw" . "xmaple"))))
+                                ("mkv" . "mpv"))))
 
 (use-package dired-hide-dotfiles
   :hook (dired-mode . dired-hide-dotfiles-mode)
@@ -312,9 +310,6 @@
 
 ;; needed for marking extensions
 (require 'dired-x)
-
-;; move to trash rather than deleting
-;; (setq delete-by-moving-to-trash t)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -405,7 +400,6 @@
   :hook (company-mode . company-box-mode))
 
 (use-package python-mode
-  :ensure t
   ;:hook (python-mode . lsp-deferred)
   :custom
   (python-shell-interpreter "python"))
