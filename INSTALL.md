@@ -168,6 +168,9 @@ bluetoothctl
 ```
 
 ### Mullvad
+
+#### Using openvpn
+
 ```
 sudo pacman -S openvpn openresolv
 // download config from https://www.mullvad.net/download/config/
@@ -178,6 +181,14 @@ cudo chmod 750 /etc/openvpn/update-resolv-conf
 sudo cp /etc/openvpn/client/mullvad_xx /etc/openvpn/client/mullvad.conf
 sudo systemctl start openvpn-client@mullvad.service
 curl https://am.i.mullvad.net/connected
+```
+
+#### Using the client (AUR)
+
+```
+yay -S mullvad-vpn
+yay -S systemd-resolvconf
+sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
 ### Sync time
